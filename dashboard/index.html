@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sandgrain — Lido Exposure Monitor (Track 1)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 32px;
+      background: #0b1020;
+      color: #f5f7fb;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 14px;
+      color: #8fa0c7;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 48px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      color: #b8c0d9;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .timestamp {
+      color: #8fa0c7;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #151c33;
+      border: 1px solid #26304d;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .label {
+      font-size: 14px;
+      color: #9fb0d8;
+      margin-bottom: 10px;
+    }
+
+    .value {
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .panel {
+      background: #12182b;
+      border-left: 4px solid #6aa2ff;
+      padding: 18px;
+      border-radius: 10px;
+      color: #d8e1ff;
+      margin-bottom: 18px;
+    }
+
+    .panel strong {
+      color: #ffffff;
+    }
+
+    .footer {
+      margin-top: 28px;
+      font-size: 13px;
+      color: #7f90b8;
+    }
+
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 34px;
+      }
+
+      .value {
+        font-size: 24px;
+      }
+
+      body {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="eyebrow">Sandgrain — Track 1</div>
+    <h1>Lido Exposure Monitor</h1>
+    <div class="subtitle">Real-time view of Lido staking asset exposure across Aave</div>
+    <div class="timestamp" id="timestamp">Loading snapshot...</div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">stETH Total Supply</div>
+        <div class="value" id="steth_total_supply">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">wstETH Total Supply</div>
+        <div class="value" id="wsteth_total_supply">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Aave V2 stETH Exposure</div>
+        <div class="value" id="aave_v2_steth_supply">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Aave V2 Share of stETH</div>
+        <div class="value" id="aave_v2_percent_of_steth">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Aave V3 wstETH Exposure</div>
+        <div class="value" id="aave_v3_wsteth_supply">-</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Aave V3 Share of wstETH</div>
+        <div class="value" id="aave_v3_percent_of_wsteth">-</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <strong>Key Insight:</strong>
+      Aave V3 wstETH is the dominant Lido-on-Aave exposure metric, while Aave V2 stETH is comparatively minimal.
+    </div>
+
+    <div class="panel">
+      <strong>Risk Interpretation:</strong><br><br>
+      • Aave V3 currently holds a large portion of total wstETH supply.<br>
+      • This creates concentration risk where a single lending market becomes a dominant liquidity sink.<br>
+      • In stressed conditions such as liquidations or depeg scenarios, this concentration could amplify systemic risk across Lido and Aave.<br>
+      • Monitoring this ratio over time is important for governance, risk teams, and protocol researchers.
+    </div>
+
+    <div class="footer">
+      Snapshot source: <code>track1_snapshot.json</code>
+    </div>
+  </div>
+
+  <script>
+    function formatNumber(x) {
+      return Number(x).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+
+    function formatPercent(x) {
+      return Number(x).toFixed(4) + "%";
+    }
+
+    fetch("/track1_snapshot.json")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("timestamp").textContent =
+          "Last updated (UTC): " + data.timestamp_utc;
+
+        document.getElementById("steth_total_supply").textContent =
+          formatNumber(data.steth_total_supply);
+
+        document.getElementById("wsteth_total_supply").textContent =
+          formatNumber(data.wsteth_total_supply);
+
+        document.getElementById("aave_v2_steth_supply").textContent =
+          formatNumber(data.aave_v2_steth_supply);
+
+        document.getElementById("aave_v2_percent_of_steth").textContent =
+          formatPercent(data.aave_v2_percent_of_steth);
+
+        document.getElementById("aave_v3_wsteth_supply").textContent =
+          formatNumber(data.aave_v3_wsteth_supply);
+
+        document.getElementById("aave_v3_percent_of_wsteth").textContent =
+          formatPercent(data.aave_v3_percent_of_wsteth);
+      })
+      .catch(error => {
+        document.getElementById("timestamp").textContent =
+          "Failed to load snapshot JSON";
+        console.error(error);
+      });
+  </script>
+</body>
+</html>
