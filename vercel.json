@@ -1,0 +1,6 @@
+{
+  "routes": [
+    { "src": "/track1_snapshot.json", "dest": "/track1_snapshot.json" },
+    { "src": "/(.*)", "dest": "/dashboard/index.html" }
+  ]
+}
